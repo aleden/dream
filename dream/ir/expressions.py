@@ -606,7 +606,7 @@ class ShiftExpression(NoncommutativeBinaryExpression):
 
     def to_symbolic(self):
         sym_op1, sym_op2 = self.first_operand.to_symbolic(), self.second_operand.to_symbolic()
-        print sym_op1, sym_op2
+        print(sym_op1, sym_op2)
         if self.shift_operator == '>>':
             if self.is_signed:
                 return sym_op1 >> sym_op2
@@ -730,8 +730,8 @@ class CommutativeAssociativeLogicExpression(CommutativeAssociativeExpression):
         try:
             sym = self.to_symbolic()
 
-        except NotImplementedError, e:
-            print e.message
+        except NotImplementedError as e:
+            print(e.message)
 
 
 

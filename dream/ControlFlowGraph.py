@@ -13,7 +13,7 @@ from dream.DataFlowAnalysis import ReachingDefinitionsAnalysis, LivenessAnalysis
 from dream.ir.instructions import Assignment, Instruction, Break, Return
 from dream.ir.expressions import HighLevelCondition, LocalVariable, NumericConstant, Expression
 from dream.enums import NodeType
-from graph_visitors import SliceVisitor, DepthFirstSearchVisitor
+from dream.graph_visitors import SliceVisitor, DepthFirstSearchVisitor
 from dream.logic import conditions_equal, get_AND_remaining_term
 
 
@@ -587,10 +587,10 @@ class ControlFlowGraph(Graph):
         for v in region_nodes:
             successors.update([s for s in v.out_neighbours() if s not in region_nodes])
         if len(successors) == 1:
-            successor_node = iter(successors).next()
+            successor_node = next(iter(successors))
             g_slice = self.compute_graph_slice(header, successor_node)
             diff = set(g_slice.slice_orig_map.values()).symmetric_difference(set(region_nodes))
-            return len(diff) == 1 and iter(diff).next() == successor_node
+            return len(diff) == 1 and next(iter(diff)) == successor_node
             return not set(g_slice.slice_orig_map.values()).symmetric_difference(set(region_nodes))
         else:
             return len(successors) == 0
@@ -804,7 +804,7 @@ class ControlFlowGraph(Graph):
         control_flow_tree.finalize()
         final_ast = control_flow_tree.root
         if isinstance(final_ast, SequenceNode) and not final_ast.children:
-            print "returning empty sequence"
+            print("returning empty sequence")
         return control_flow_tree.root
 
     def print_conditions(self, n):
@@ -908,7 +908,7 @@ class ControlFlowGraph(Graph):
         # TODO check if this step leads to improvement: if not undo
         self.refine_loop_exits(loop_slice)
 
-        loop_nodes = loop_slice.slice_orig_map.values()
+        loop_nodes = list(loop_slice.slice_orig_map.values())
 
         abnormal_entry_edges = self.get_loop_abnormal_entry_edges(header_node, loop_nodes)
         if abnormal_entry_edges:
@@ -922,7 +922,7 @@ class ControlFlowGraph(Graph):
             n_successor = self.restructure_abnormal_loop_exits_using_structuring_variable(loop_nodes, loop_exit_edges)
             break_nodes = self.add_break_statements(loop_slice, n_successor)
         elif len(loop_exits) == 1:
-            n_successor = iter(loop_exits).next()
+            n_successor = next(iter(loop_exits))
             break_nodes = self.add_break_statements(loop_slice, n_successor)
         else:
             n_successor = None
@@ -1079,7 +1079,7 @@ class ControlFlowGraph(Graph):
         loop_slice.header = loop_slice.cfg.add_vertex()
         loop_slice.cfg.vertex_properties['type'][loop_slice.header] = NodeType.CONDITIONAL
         h_current = loop_slice.header
-        for i in xrange(len(refined_loop_entries) - 1):
+        for i in range(len(refined_loop_entries) - 1):
             entry_node = refined_loop_entries[i].target_node
             entry_condition = refined_loop_entries[i].condition_from_header
             edge_to_entry_node = loop_slice.cfg.add_edge(h_current, entry_node)
@@ -1405,7 +1405,7 @@ class ControlFlowGraph(Graph):
                 #stmts = self.vertex_properties['ast'][v].instructions
                 stmts = self.vertex_properties['ast'][v].children
             elif self.vertex_properties['type'][v] == NodeType.CONDITIONAL:
-                tag = self.edge_properties['tag'][self.edge(v, v.out_neighbours().next())]
+                tag = self.edge_properties['tag'][self.edge(v, next(v.out_neighbours()))]
                 stmts = [self.conditions_map[tag if isinstance(tag, Symbol) else tag.args[0]]]
 
             for stmt in stmts:
@@ -1479,7 +1479,7 @@ class ControlFlowGraph(Graph):
         simple_seq = self.get_simple_sequence()
         while simple_seq is not None:
             if simple_seq[-1].out_degree() == 1:
-                e = self.add_edge(simple_seq[0], simple_seq[-1].out_neighbours().next())
+                e = self.add_edge(simple_seq[0], next(simple_seq[-1].out_neighbours()))
                 self.edge_properties['tag'][e] = None
             ast = self.vertex_properties['ast'][simple_seq[0]]
             for v in simple_seq[1:]:
@@ -1497,7 +1497,7 @@ class ControlFlowGraph(Graph):
     def get_simple_sequence(self):
         for v in self.vertices():
             if v.out_degree() == 1:
-                v_succ = v.out_neighbours().next()
+                v_succ = next(v.out_neighbours())
                 if v_succ.in_degree() == 1 and v_succ.out_degree() <= 1:
                     path_nodes = [v, v_succ]
                     self.extend_sequence(path_nodes)
@@ -1507,13 +1507,13 @@ class ControlFlowGraph(Graph):
     @staticmethod
     def extend_sequence(path_vertices):
         v_start = path_vertices[0]
-        while v_start.in_degree() == 1 and v_start.in_neighbours().next().out_degree() == 1:
-            v_start = v_start.in_neighbours().next()
+        while v_start.in_degree() == 1 and next(v_start.in_neighbours()).out_degree() == 1:
+            v_start = next(v_start.in_neighbours())
             path_vertices.insert(0, v_start)
 
         v_end = path_vertices[-1]
         while v_end.out_degree() == 1:
-            v_end = v_end.out_neighbours().next()
+            v_end = next(v_end.out_neighbours())
             if v_end.in_degree() != 1 or v_end.out_degree() != 1:
                 break
             path_vertices.append(v_end)

@@ -3,7 +3,7 @@
 
 from sympy import Not, And, true, Symbol, Or
 from sympy.logic.boolalg import to_cnf, simplify_logic
-from sys import maxint
+from sys import maxsize
 from dream.ir.expressions import Expression
 from dream.ir.instructions import Instruction, Break, Return
 from dream.logic import conditions_equal, get_AND_remaining_term, get_arguments_number, is_trivial_condition, has_compound_trivial_condition, get_condition_from_logic_expression, get_negated_condition, alias_free_expression
@@ -957,7 +957,7 @@ class ControlFlowTree:
         candidates = []
         node = caseNodeList[caseNodeIndex]
         caseCondElements = self.getCaseConditionElements(node.reaching_condition)
-        minDifference = maxint
+        minDifference = sys.maxsize
         for index in range(caseNodeIndex + 1, len(caseNodeList)):
             nextCaseNode = caseNodeList[index]
             nextCaseCondElements = self.getCaseConditionElements(nextCaseNode.reaching_condition)

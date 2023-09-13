@@ -50,8 +50,8 @@ def compile_transformation_rules(in_file, out_dir):
 
 
 def print_help_message():
-    print 'dream.py (--decompile|--compile-transformation-rules) ' \
-          '-i <input file> -o <output file/directory> [--json] [--split-returns]'
+    print('dream.py (--decompile|--compile-transformation-rules) ' \
+          '-i <input file> -o <output file/directory> [--json] [--split-returns]')
 
 
 def main():

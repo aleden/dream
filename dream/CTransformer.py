@@ -50,7 +50,7 @@ class CTransformer(object):
         self.ast_facts = []
         self.id_generator = ID()
         with open(config.IMPORTS) as f_imports:
-            self.api_functions = json.load(f_imports, encoding='ascii')
+            self.api_functions = json.load(f_imports)
         self.prolog_engine = Prolog()
         self.start_prolog_engine()
 

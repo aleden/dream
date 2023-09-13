@@ -3,7 +3,7 @@
 
 from sympy import And, Or, Not, Symbol, true, false
 from sympy.logic.boolalg import to_cnf, bool_map, simplify_logic
-from ir.expressions import ORExpression, ANDExpression, HighLevelCondition, NumericConstant, LocalVariable, LogicalNotExpression, Call
+from dream.ir.expressions import ORExpression, ANDExpression, HighLevelCondition, NumericConstant, LocalVariable, LogicalNotExpression, Call
 
 
 def get_AND_remaining_term(cond_inner, cond_outer):

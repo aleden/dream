@@ -87,7 +87,7 @@ class ReachingDefinitionsAnalysis(DataFlowAnalysis):
             if self.cfg.vertex_properties['type'][v] == NodeType.CODE:
                 #for stmt in self.cfg.vertex_properties['ast'][v].instructions:
                 for stmt in self.cfg.vertex_properties['ast'][v].children:
-                    stmt_id = self.id_stmt_map.keys()[self.id_stmt_map.values().index(stmt)]
+                    stmt_id = list(self.id_stmt_map.keys())[list(self.id_stmt_map.values()).index(stmt)]
                     if isinstance(stmt, Instruction):
                         for d in stmt.defs():
                             if isinstance(d, LocalVariable):
@@ -102,14 +102,14 @@ class ReachingDefinitionsAnalysis(DataFlowAnalysis):
             if self.cfg.vertex_properties['type'][n] == NodeType.CODE:
                 #for stmt in self.cfg.vertex_properties['ast'][n].instructions:
                 for stmt in self.cfg.vertex_properties['ast'][n].children:
-                    stmt_id = self.id_stmt_map.keys()[self.id_stmt_map.values().index(stmt)]
+                    stmt_id = list(self.id_stmt_map.keys())[list(self.id_stmt_map.values()).index(stmt)]
                     self.in_s[stmt_id] = reach_in
                     self.out_s[stmt_id] = self.gen_s[stmt_id] | (reach_in - self.kill_s[stmt_id])
                     reach_in = self.out_s[stmt_id]
             elif self.cfg.vertex_properties['type'][n] == NodeType.CONDITIONAL:
-                tag = self.cfg.edge_properties['tag'][self.cfg.edge(n, n.out_neighbours().next())]
+                tag = self.cfg.edge_properties['tag'][self.cfg.edge(n, next(n.out_neighbours()))]
                 cond_expr = self.cfg.conditions_map[tag if isinstance(tag, Symbol) else tag.args[0]]
-                stmt_id = self.id_stmt_map.keys()[self.id_stmt_map.values().index(cond_expr)]
+                stmt_id = list(self.id_stmt_map.keys())[list(self.id_stmt_map.values()).index(cond_expr)]
                 self.in_s[stmt_id] = self.in_b[n]
                 self.out_s[stmt_id] = self.out_b[n]
             assert reach_in == self.out_b[n], "{0}: {1} != {2}".format(int(n), [int(i) for i in reach_in],
@@ -152,7 +152,7 @@ class LivenessAnalysis(DataFlowAnalysis):
             if self.cfg.vertex_properties['type'][v] == NodeType.CODE:
                 #for stmt in reversed(self.cfg.vertex_properties['ast'][v].instructions):
                 for stmt in reversed(self.cfg.vertex_properties['ast'][v].children):
-                    stmt_id = self.id_stmt_map.keys()[self.id_stmt_map.values().index(stmt)]
+                    stmt_id = list(self.id_stmt_map.keys())[list(self.id_stmt_map.values()).index(stmt)]
                     if isinstance(stmt, Call):
                         defs = set()
                         uses = {u for u in stmt.elements() if isinstance(u, LocalVariable)}
@@ -165,9 +165,9 @@ class LivenessAnalysis(DataFlowAnalysis):
                     self.kill_b[v].update(defs)
 
             elif self.cfg.vertex_properties['type'][v] == NodeType.CONDITIONAL:
-                tag = self.cfg.edge_properties['tag'][self.cfg.edge(v, v.out_neighbours().next())]
+                tag = self.cfg.edge_properties['tag'][self.cfg.edge(v, next(v.out_neighbours()))]
                 cond_expr = self.cfg.conditions_map[tag if isinstance(tag, Symbol) else tag.args[0]]
-                stmt_id = self.id_stmt_map.keys()[self.id_stmt_map.values().index(cond_expr)]
+                stmt_id = list(self.id_stmt_map.keys())[list(self.id_stmt_map.values()).index(cond_expr)]
                 self.gen_b[v] = {u for u in cond_expr.elements() if isinstance(u, LocalVariable)}
                 self.gen_s[stmt_id] = {u for u in cond_expr.elements() if isinstance(u, LocalVariable)}
 
@@ -177,15 +177,15 @@ class LivenessAnalysis(DataFlowAnalysis):
                 live_out = self.out_b[n]
                 #for stmt in reversed(self.cfg.vertex_properties['ast'][n].instructions):
                 for stmt in reversed(self.cfg.vertex_properties['ast'][n].children):
-                    stmt_id = self.id_stmt_map.keys()[self.id_stmt_map.values().index(stmt)]
+                    stmt_id = list(self.id_stmt_map.keys())[list(self.id_stmt_map.values()).index(stmt)]
                     self.out_s[stmt_id] = live_out
                     self.in_s[stmt_id] = self.gen_s[stmt_id] | (live_out - self.kill_s[stmt_id])
                     live_out = self.in_s[stmt_id]
                 assert live_out == self.in_b[n]
             elif self.cfg.vertex_properties['type'][n] == NodeType.CONDITIONAL:
-                tag = self.cfg.edge_properties['tag'][self.cfg.edge(n, n.out_neighbours().next())]
+                tag = self.cfg.edge_properties['tag'][self.cfg.edge(n, next(n.out_neighbours()))]
                 cond_expr = self.cfg.conditions_map[tag if isinstance(tag, Symbol) else tag.args[0]]
-                stmt_id = self.id_stmt_map.keys()[self.id_stmt_map.values().index(cond_expr)]
+                stmt_id = list(self.id_stmt_map.keys())[list(self.id_stmt_map.values()).index(cond_expr)]
                 self.out_s[stmt_id] = self.out_b[n]
                 self.in_s[stmt_id] = self.gen_s[stmt_id] | (self.out_b[n] - self.kill_s[stmt_id])
                 assert self.in_s[stmt_id] == self.in_b[n], "{0}: {1} != {2}".format(int(n), [str(i) for i in self.in_s[stmt_id]],

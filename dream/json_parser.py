@@ -31,7 +31,7 @@ class JsonGraphParser:
 
     def graph_from_json(self, file_name):
         f = open(file_name)
-        self.g_json = json.load(f, encoding='ascii')
+        self.g_json = json.load(f)
         f.close()
         nodes = self.g_json['cfg']['nodes']
 
@@ -58,7 +58,7 @@ class JsonGraphParser:
     def add_edges(self, v, successors_json):
         for s in successors_json:
             e = self.cfg.add_edge(v, int(s['node_id']))
-            label = s['tag'].encode('ascii')
+            label = s['tag']
             if label == 'None':
                 self.cfg.edge_properties['tag'][e] = None
             elif label[0] == '!':
@@ -93,7 +93,7 @@ class JsonGraphParser:
         elif inst_json['instruction_type'] == 'Return':
             return Return(self.make_expression(inst_json['operand']))
         else:
-            print inst_json
+            print(inst_json)
             assert False, "unsupported instruction type: {0}".format(inst_json[
                 'instruction_type'])
 

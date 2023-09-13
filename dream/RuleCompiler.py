@@ -1,7 +1,6 @@
 # Copyright (C) 2011-2017 Khaled Yakdan.
 # All rights reserved.
 
-import ConfigParser
 import getopt
 import os
 import sys
@@ -282,7 +281,7 @@ def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'i:o:')
     except getopt.GetoptError:
-        print 'compile_rule.py -i <input file> -o <output directory>'
+        print('compile_rule.py -i <input file> -o <output directory>')
         sys.exit(2)
 
     opts = dict(opts)
