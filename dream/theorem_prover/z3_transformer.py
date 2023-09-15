@@ -26,11 +26,8 @@ class Z3Simplifier(object):
             self.construct_var_map(expr)
             result = Then('simplify', 'propagate-values', 'ctx-solver-simplify', 'simplify')(z3_expr)
             return self.z3_to_expr(result.as_expr())
-        except NotImplementedError as e:
-            print(e.message)
-            return expr
         except Exception as e:
-            print(e.message)
+            l.warning("<%s> failed to simplify \"%s\": %s", type(e).__name__, str(expr), str(e))
             return expr
 
     def z3_to_expr(self, z3_expr):
@@ -61,8 +58,7 @@ class Z3Simplifier(object):
         elif self.is_bv_variable(z3_expr):
             return self.variable_map[z3_expr.decl().name()].deep_copy()
         else:
-            l.warning(z3_expr, z3_expr.decl().name(), op_kind)
-            raise NotImplementedError('Transformation from z3 to DREAM IR is not implemented')
+            raise NotImplementedError("z3_to_expr: cannot transform \"%s\" to DREAM IR" % str(z3_expr))
 
     def z3add_args(self, z3add):
         return self.z3add_arg(z3add.arg(0)) + self.z3add_arg(z3add.arg(1))
@@ -83,8 +79,7 @@ class Z3Simplifier(object):
         elif high == 31 and low == 31:
             return HighLevelCondition(self.z3_to_expr(z3_extract.arg(0)), '<', NumericConstant(0))
         else:
-            print(z3_extract)
-            raise NotImplementedError('Transformation from z3 to DREAM IR is not implemented')
+            raise NotImplementedError('z3extract_to_expr: cannot transform \"%s\" to DREAM IR' % str(z3_extract))
 
     def z3cmp_to_expr(self, z3_cmp):
         if self.compares_offset_expr_to_const(z3_cmp):

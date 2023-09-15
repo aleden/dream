@@ -44,7 +44,7 @@ class Expression(object):
         return self
 
     def to_symbolic(self):
-        raise NotImplementedError('{0}: This method is not implemented yet'.format(type(self)))
+        raise NotImplementedError("to_symbolic failed on %s" % str(type(self)))
 
 
 class LocalVariable(Expression):
