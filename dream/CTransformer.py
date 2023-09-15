@@ -618,10 +618,10 @@ class CTransformer(object):
         return True
 
     def local_variable_id(self, name):
-        return self.prolog_engine.query('localT(Id, _, {0})'.format('\'' + name + '\'')).next()['Id']
+        return next(self.prolog_engine.query('localT(Id, _, {0})'.format('\'' + name + '\'')))['Id']
 
     def in_neighbours(self, node_id):
-        return set(self.prolog_engine.query('in_neighbours({0}, InNeighbours)'.format(node_id)).next()['InNeighbours'])
+        return set(next(self.prolog_engine.query('in_neighbours({0}, InNeighbours)'.format(node_id)))['InNeighbours'])
 
     def is_cfg_node(self, node_id):
         return len([a for a in self.prolog_engine.query('cfg_edge(P, {0})'.format(node_id))]) > 0
@@ -734,15 +734,15 @@ class CTransformer(object):
 
     def get_middle_nodes(self, source_id, target_id):
         #print 'get_middle_statements({0}, {1}, {2})'.format(source_id, target_id)
-        middle_ids = self.prolog_engine.query('middle_nodes({0}, {1}, NodeSet)'.format(
-            source_id, target_id)).next()['NodeSet']
+        middle_ids = next(self.prolog_engine.query('middle_nodes({0}, {1}, NodeSet)'.format(
+            source_id, target_id)))['NodeSet']
         return set(middle_ids) if type(middle_ids) == list else set()
         #return [self.id_node_map[i] for i in middle_ids if isinstance(self.id_node_map[i], Instruction)]
 
     def get_middle_nodes_not_passing_by(self, source_id, target_id, not_passing_by_id):
         #print 'get_middle_statements({0}, {1}, {2})'.format(source_id, target_id, not_passing_by_id)
-        middle_ids = self.prolog_engine.query('middle_nodes_not_passing_by({0}, {1}, {2}, NodeSet)'.format(
-            source_id, target_id, not_passing_by_id)).next()['NodeSet']
+        middle_ids = next(self.prolog_engine.query('middle_nodes_not_passing_by({0}, {1}, {2}, NodeSet)'.format(
+            source_id, target_id, not_passing_by_id)))['NodeSet']
         return set(middle_ids) if type(middle_ids) == list else set()
 
     def add_preserving_assignment(self, symbol, first_use_id, condition_map):
@@ -1379,7 +1379,7 @@ class CTransformer(object):
                         self.rename_if_not_renamed(call_parent.lhs_operand.name, ret_name, renamed_vars_map)
 
         self.rename_parameters(renamed_vars_map)
-        self.rename_local_variables(renamed_vars_map.keys())
+        self.rename_local_variables(list(renamed_vars_map.keys()))
 
     def rename_parameters(self, renamed_variables):
         idx = 1

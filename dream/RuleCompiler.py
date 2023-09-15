@@ -4,6 +4,7 @@
 import getopt
 import os
 import sys
+import configparser
 from pycparser import c_ast, c_lexer, c_parser
 
 
@@ -252,7 +253,7 @@ class TransformationRule:
 class RuleCompiler:
     def __init__(self, src_file, out_dir):
         self.out_dir = out_dir
-        rules_src = ConfigParser.ConfigParser()
+        rules_src = configparser.ConfigParser(interpolation=None)
         rules_src.read(src_file)
         self.rules = [{
                           'signature': rules_src.get(rule, 'Signature'),
